@@ -1,6 +1,7 @@
 import Navbar from '@/components/layout/Navbar';
 import Footer from '@/components/layout/Footer';
 import StarRating from '@/components/ui/StarRating';
+import ReviewForm from '@/components/products/ReviewForm';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 
@@ -102,6 +103,9 @@ export default async function ProductDetailPage({ params }: { params: Promise<{ 
             <h2 style={{ fontFamily: 'var(--font-heading)', fontSize: '1.75rem', color: '#2F4F4F', marginBottom: '1.5rem', paddingBottom: '0.75rem', borderBottom: '2px solid #e5e5c0' }}>
               Reviews ({reviews.length})
             </h2>
+
+            <ReviewForm productId={product._id} />
+
             {reviews.length > 0 ? (
               <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
                 {reviews.map((r: any) => (
