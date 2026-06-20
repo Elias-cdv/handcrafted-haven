@@ -5,10 +5,12 @@ import { AuthRequest } from '../middleware/auth.middleware';
 
 export const getProducts = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   try {
-    const { category, minPrice, maxPrice, search, page = 1, limit = 12 } = req.query;
-    const filter: any = { isAvailable: true };
+    const { category, minPrice, maxPrice, search, artisan, page = 1, limit = 12 } = req.query;
+    const filter: any = {};
 
+    if (!artisan) filter.isAvailable = true;
     if (category) filter.category = category;
+    if (artisan) filter.artisan = artisan;
     if (minPrice || maxPrice) {
       filter.price = {};
       if (minPrice) filter.price.$gte = Number(minPrice);
@@ -40,8 +42,7 @@ export const getProducts = async (req: Request, res: Response, next: NextFunctio
 
 export const getProductById = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   try {
-    const product = await Product.findById(req.params.id)
-      .populate('artisan', 'name avatar profile');
+    const product = await Product.findById(req.params.id).populate('artisan', 'name avatar profile');
     if (!product) throw new ApiError('Product not found', 404);
     res.status(200).json({ success: true, data: product });
   } catch (error) {
@@ -80,7 +81,7 @@ export const deleteProduct = async (req: AuthRequest, res: Response, next: NextF
       throw new ApiError('You are not authorized to delete this product', 403);
     }
     await product.deleteOne();
-    res.status(204).json({ success: true, data: null });
+    res.status(200).json({ success: true, data: null });
   } catch (error) {
     next(error);
   }
