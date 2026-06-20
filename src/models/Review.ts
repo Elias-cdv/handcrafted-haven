@@ -26,7 +26,10 @@ const ReviewSchema = new Schema<IReview>(
 
 ReviewSchema.index({ product: 1, author: 1 }, { unique: true });
 
-ReviewSchema.statics.calcAverageRating = async function (productId: mongoose.Types.ObjectId) {
+ReviewSchema.statics.calcAverageRating = async function (
+  this: mongoose.Model<IReview>,
+  productId: mongoose.Types.ObjectId
+) {
   const stats = await this.aggregate([
     { $match: { product: productId } },
     { $group: { _id: '$product', avgRating: { $avg: '$rating' }, count: { $sum: 1 } } },
@@ -41,11 +44,11 @@ ReviewSchema.statics.calcAverageRating = async function (productId: mongoose.Typ
   }
 };
 
-ReviewSchema.post('save', function () {
+ReviewSchema.post('save', function (this: IReview) {
   (this.constructor as any).calcAverageRating(this.product);
 });
 
-ReviewSchema.post('deleteOne', { document: true }, function () {
+ReviewSchema.post('deleteOne', { document: true, query: false }, function (this: IReview) {
   (this.constructor as any).calcAverageRating(this.product);
 });
 
